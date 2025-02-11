@@ -4,19 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Valentine's Perfect Planner</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #ff4b6e;
-            --secondary: #ff9eaf;
-            --dark: #2c1810;
-            --light: #fff5f6;
+            --primary: #FF597B;
+            --secondary: #FF8E9E;
+            --accent: #FFC0D9;
+            --dark: #2C1810;
+            --light: #FFF5F7;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
         }
 
         body {
@@ -29,17 +31,7 @@
             padding: 2rem;
             text-align: center;
             color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .floating-hearts {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .container {
@@ -48,22 +40,16 @@
             padding: 2rem;
         }
 
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .feature-card {
+        .card {
             background: white;
             border-radius: 15px;
             padding: 2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             transition: transform 0.3s ease;
         }
 
-        .feature-card:hover {
+        .card:hover {
             transform: translateY(-5px);
         }
 
@@ -71,420 +57,369 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 0.8rem 1.5rem;
+            padding: 1rem 2rem;
             border-radius: 25px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
         .btn:hover {
             background: var(--secondary);
+            transform: scale(1.05);
         }
 
-        .quiz-container, .generator-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            margin-top: 2rem;
+        .quiz-container, .date-generator, .letter-generator {
+            display: none;
         }
 
-        .question {
-            margin-bottom: 1rem;
+        .active {
+            display: block;
         }
 
-        .options {
-            display: grid;
-            gap: 0.5rem;
+        .quiz-question {
+            margin: 1rem 0;
         }
 
         .option {
+            display: block;
             padding: 1rem;
-            border: 1px solid var(--secondary);
+            margin: 0.5rem 0;
+            background: var(--light);
             border-radius: 8px;
             cursor: pointer;
-            transition: background 0.3s ease;
         }
 
         .option:hover {
-            background: var(--light);
+            background: var(--accent);
         }
 
-        .carousel {
-            position: relative;
-            overflow: hidden;
-            height: 150px;
+        .tutorial {
+            display: flex;
+            align-items: start;
+            gap: 2rem;
             margin: 2rem 0;
         }
 
-        .carousel-content {
-            position: absolute;
-            display: flex;
-            transition: transform 0.5s ease;
-        }
-
-        .quote {
-            min-width: 100%;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .timer {
-            text-align: center;
-            font-size: 2rem;
-            margin: 2rem 0;
-        }
-
-        .collage-maker {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .collage-slot {
-            aspect-ratio: 1;
-            background: #f0f0f0;
-            border: 2px dashed var(--secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .wheel-container {
+        .video-container {
+            flex: 1;
             position: relative;
-            width: 300px;
-            height: 300px;
-            margin: 2rem auto;
+            padding-bottom: 56.25%;
+            height: 0;
         }
 
-        .wheel {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(
-                var(--primary) 0% 25%,
-                var(--secondary) 25% 50%,
-                var(--primary) 50% 75%,
-                var(--secondary) 75% 100%
-            );
-            transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-        }
-
-        .spinner {
+        .video-container img {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            background: white;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 1;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
+            object-fit: cover;
         }
 
-        .modal-content {
-            background: white;
+        .tutorial-steps {
+            flex: 1;
+        }
+
+        .step {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--light);
+            border-radius: 8px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            background: var(--light);
+            border-radius: 25px;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .result-card {
+            text-align: center;
             padding: 2rem;
+            background: var(--accent);
             border-radius: 15px;
-            max-width: 500px;
-            width: 90%;
+            margin: 2rem 0;
         }
 
         @media (max-width: 768px) {
-            .features-grid {
-                grid-template-columns: 1fr;
+            .tutorial {
+                flex-direction: column;
+            }
+            
+            .video-container {
+                padding-bottom: 75%;
             }
         }
     </style>
 </head>
 <body>
     <header class="header">
-        <div class="floating-hearts"></div>
-        <h1>Valentine's Perfect Planner</h1>
-        <p>Find the perfect gift and plan the perfect date</p>
-        <div class="timer" id="valentineCountdown"></div>
+        <h1><i class="fas fa-heart"></i> Valentine's Perfect Planner</h1>
+        <p>Find the perfect gift, plan an amazing date, or write a heartfelt message</p>
     </header>
 
     <div class="container">
-        <div class="features-grid">
-            <div class="feature-card">
-                <h2>Gift Finder Quiz</h2>
-                <p>Find the perfect gift based on your loved one's interests</p>
-                <button class="btn" onclick="startGiftQuiz()">Start Quiz</button>
-            </div>
+        <div class="nav-tabs">
+            <div class="tab active" onclick="showSection('quiz')">Gift Finder Quiz</div>
+            <div class="tab" onclick="showSection('date')">Date Generator</div>
+            <div class="tab" onclick="showSection('letter')">Love Letter Creator</div>
+        </div>
 
-            <div class="feature-card">
-                <h2>Date Night Generator</h2>
-                <p>Get personalized date ideas based on your preferences</p>
-                <button class="btn" onclick="generateDate()">Generate Date Idea</button>
+        <!-- Gift Finder Quiz -->
+        <div class="card quiz-container active" id="quiz-section">
+            <h2>Find the Perfect Gift</h2>
+            <div id="quiz-questions">
+                <div class="quiz-question">
+                    <p>What's your budget range?</p>
+                    <div class="option" onclick="selectOption('budget', 'low')">$0-50 (Budget-Friendly)</div>
+                    <div class="option" onclick="selectOption('budget', 'medium')">$51-200 (Mid-Range)</div>
+                    <div class="option" onclick="selectOption('budget', 'high')">$200+ (Luxury)</div>
+                </div>
+                <!-- More quiz questions dynamically added by JavaScript -->
             </div>
+            <div id="quiz-result" class="result-card" style="display: none;"></div>
+        </div>
 
-            <div class="feature-card">
-                <h2>Love Letter Generator</h2>
-                <p>Create a heartfelt message for your special someone</p>
-                <button class="btn" onclick="showLoveLetterGenerator()">Write Letter</button>
+        <!-- Date Generator -->
+        <div class="card date-generator" id="date-section">
+            <h2>Date Night Ideas Generator</h2>
+            <div class="quiz-question">
+                <p>Select your preferences:</p>
+                <div class="option" onclick="selectDatePreference('indoor')">Indoor Date</div>
+                <div class="option" onclick="selectDatePreference('outdoor')">Outdoor Adventure</div>
+                <div class="option" onclick="selectDatePreference('romantic')">Romantic Evening</div>
+            </div>
+            <div id="date-result" class="result-card" style="display: none;"></div>
+        </div>
+
+        <!-- Love Letter Generator -->
+        <div class="card letter-generator" id="letter-section">
+            <h2>Romantic Message Generator</h2>
+            <div class="quiz-question">
+                <p>How long have you been together?</p>
+                <input type="text" id="relationship-length" placeholder="e.g., 2 years" class="option">
+                <p>What's one thing you love about them?</p>
+                <input type="text" id="love-reason" placeholder="e.g., Their smile" class="option">
+                <button class="btn" onclick="generateLetter()">Create Love Letter</button>
+            </div>
+            <div id="letter-result" class="result-card" style="display: none;"></div>
+        </div>
+
+        <!-- DIY Gift Tutorials -->
+        <div class="card">
+            <h2>DIY Valentine's Gifts</h2>
+            <div class="tutorial">
+                <div class="video-container">
+                    <img src="/api/placeholder/400/320" alt="DIY Heart Photo Frame Tutorial">
+                </div>
+                <div class="tutorial-steps">
+                    <h3>Heart Photo Frame</h3>
+                    <div class="step">1. Gather materials: wooden frame, red paint, heart stencils</div>
+                    <div class="step">2. Paint the frame base color</div>
+                    <div class="step">3. Apply heart stencils and paint patterns</div>
+                    <div class="step">4. Add your favorite photo</div>
+                </div>
             </div>
         </div>
 
-        <div class="carousel">
-            <div class="carousel-content" id="quoteCarousel">
-                <!-- Quotes will be inserted here -->
+        <!-- Stay-at-Home Date Ideas -->
+        <div class="card">
+            <h2>Cozy At-Home Date Ideas</h2>
+            <div id="home-dates">
+                <!-- Dynamically populated by JavaScript -->
             </div>
-        </div>
-
-        <div class="wheel-container">
-            <div class="wheel"></div>
-            <div class="spinner" onclick="spinWheel()"></div>
-        </div>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <h2 id="modalTitle"></h2>
-            <div id="modalContent"></div>
-            <button class="btn" onclick="closeModal()">Close</button>
         </div>
     </div>
 
     <script>
-        // Gift ideas database
+        // Global state
+        const state = {
+            quizAnswers: {},
+            datePreference: '',
+            selectedSection: 'quiz'
+        };
+
+        // Gift recommendations based on budget
         const giftIdeas = {
-            budget: {
-                romantic: [
-                    "Handmade love coupon book",
-                    "Personalized photo album",
-                    "DIY gift basket",
-                    "Handwritten love letters collection",
-                    "Custom playlist or mixtape"
-                ],
-                practical: [
-                    "Cozy socks with love messages",
-                    "Homemade treats",
-                    "Customized coffee mug",
-                    "Self-care package",
-                    "Handmade scarf or mittens"
-                ],
-                creative: [
-                    "Paint and sip at home kit",
-                    "DIY craft project",
-                    "Memory jar with special moments",
-                    "Handmade jewelry",
-                    "Custom artwork"
-                ]
-            },
-            luxury: {
-                romantic: [
-                    "Weekend getaway package",
-                    "Spa day for two",
-                    "Fine dining experience",
-                    "Jewelry piece",
-                    "Professional photoshoot session"
-                ],
-                practical: [
-                    "High-end tech gadget",
-                    "Designer accessories",
-                    "Premium subscription box",
-                    "Professional massage package",
-                    "Luxury watch"
-                ],
-                creative: [
-                    "Art class series",
-                    "Personal chef experience",
-                    "Custom portrait commission",
-                    "Hot air balloon ride",
-                    "Private dance lessons"
-                ]
-            }
+            low: [
+                "Handmade photo album with memories",
+                "Personalized love coupon book",
+                "Custom playlist with meaningful songs",
+                "Hand-written love letters collection"
+            ],
+            medium: [
+                "Spa day experience package",
+                "Customized jewelry piece",
+                "Weekend getaway package",
+                "Professional photoshoot session"
+            ],
+            high: [
+                "Luxury watch",
+                "Designer jewelry",
+                "Romantic vacation package",
+                "High-end electronics"
+            ]
         };
 
-        // Date ideas database
+        // Date night ideas
         const dateIdeas = {
-            indoor: {
-                budget: [
-                    "Cook a romantic dinner together",
-                    "Indoor picnic with fairy lights",
-                    "Board game marathon",
-                    "Movie marathon with themed snacks",
-                    "DIY spa day at home"
-                ],
-                luxury: [
-                    "Private chef experience",
-                    "In-home wine tasting",
-                    "Personal concert streaming",
-                    "Indoor garden setup",
-                    "Virtual reality experience"
-                ]
-            },
-            outdoor: {
-                budget: [
-                    "Sunset picnic in the park",
-                    "Nature walk and photography",
-                    "Star gazing night",
-                    "Beach day with packed lunch",
-                    "Local farmers market visit"
-                ],
-                luxury: [
-                    "Hot air balloon ride",
-                    "Private yacht dinner",
-                    "Helicopter tour",
-                    "Private garden party",
-                    "Luxury camping experience"
-                ]
-            }
+            indoor: [
+                "Cooking class at home",
+                "Indoor picnic with fairy lights",
+                "Movie marathon with themed snacks",
+                "Paint and sip evening"
+            ],
+            outdoor: [
+                "Sunset hiking adventure",
+                "Beachside picnic",
+                "Botanical garden tour",
+                "Stargazing night"
+            ],
+            romantic: [
+                "Candlelit dinner with live music",
+                "Dance lesson followed by dinner",
+                "Sunset sail",
+                "Wine tasting experience"
+            ]
         };
 
-        // Love quotes for carousel
-        const loveQuotes = [
-            "Love is composed of a single soul inhabiting two bodies. - Aristotle",
-            "Where there is love there is life. - Mahatma Gandhi",
-            "The best thing to hold onto in life is each other. - Audrey Hepburn",
-            "Love is not just looking at each other, it's looking in the same direction. - Antoine de Saint-Exupéry",
-            "To love and be loved is to feel the sun from both sides. - David Viscott"
+        // Stay at home date ideas
+        const stayHomeIdeas = [
+            {
+                title: "Romantic Movie Night",
+                description: "Create a cozy fort with blankets and pillows, prepare movie snacks, and watch romantic classics together.",
+                materials: ["Blankets", "Pillows", "Fairy lights", "Snacks", "Romantic movies"]
+            },
+            {
+                title: "Cooking Adventure",
+                description: "Choose a new recipe to cook together, set up a romantic table setting, and enjoy your creation.",
+                materials: ["Recipe ingredients", "Candles", "Music playlist", "Wine (optional)"]
+            },
+            {
+                title: "Indoor Spa Night",
+                description: "Create a relaxing spa atmosphere at home with massages, face masks, and peaceful music.",
+                materials: ["Massage oil", "Face masks", "Scented candles", "Relaxing music"]
+            }
         ];
 
-        // Initialize countdown timer
-        function initCountdown() {
-            const valentineDay = new Date("2025-02-14T00:00:00").getTime();
+        // Show selected section
+        function showSection(section) {
+            state.selectedSection = section;
+            document.querySelectorAll('.quiz-container, .date-generator, .letter-generator').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             
-            setInterval(() => {
-                const now = new Date().getTime();
-                const distance = valentineDay - now;
-
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                document.getElementById("valentineCountdown").innerHTML = 
-                    `${days}d ${hours}h ${minutes}m ${seconds}s until Valentine's Day`;
-            }, 1000);
+            const sectionElement = document.getElementById(`${section}-section`);
+            const tabElement = Array.from(document.querySelectorAll('.tab')).find(tab => tab.textContent.toLowerCase().includes(section));
+            
+            sectionElement.style.display = 'block';
+            tabElement.classList.add('active');
         }
 
-        // Initialize quote carousel
-        function initQuoteCarousel() {
-            const carousel = document.getElementById("quoteCarousel");
-            let currentQuote = 0;
-
-            // Add quotes to carousel
-            loveQuotes.forEach(quote => {
-                const quoteDiv = document.createElement("div");
-                quoteDiv.className = "quote";
-                quoteDiv.textContent = quote;
-                carousel.appendChild(quoteDiv);
-            });
-
-            // Rotate quotes
-            setInterval(() => {
-                currentQuote = (currentQuote + 1) % loveQuotes.length;
-                carousel.style.transform = `translateX(-${currentQuote * 100}%)`;
-            }, 5000);
+        // Quiz option selection
+        function selectOption(question, answer) {
+            state.quizAnswers[question] = answer;
+            const result = giftIdeas[answer][Math.floor(Math.random() * giftIdeas[answer].length)];
+            
+            const resultElement = document.getElementById('quiz-result');
+            resultElement.innerHTML = `
+                <h3>Perfect Gift Suggestion</h3>
+                <p>${result}</p>
+                <button class="btn" onclick="resetQuiz()">Try Again</button>
+            `;
+            resultElement.style.display = 'block';
         }
 
-        // Gift quiz functionality
-        function startGiftQuiz() {
-            const questions = [
-                {
-                    question: "What's your budget range?",
-                    options: ["Budget-friendly", "Luxury"]
-                },
-                {
-                    question: "What's their primary interest?",
-                    options: ["Romantic gestures", "Practical items", "Creative experiences"]
-                }
+        // Date preference selection
+        function selectDatePreference(preference) {
+            state.datePreference = preference;
+            const result = dateIdeas[preference][Math.floor(Math.random() * dateIdeas[preference].length)];
+            
+            const resultElement = document.getElementById('date-result');
+            resultElement.innerHTML = `
+                <h3>Your Perfect Date Idea</h3>
+                <p>${result}</p>
+                <button class="btn" onclick="generateNewDate('${preference}')">Generate Another</button>
+            `;
+            resultElement.style.display = 'block';
+        }
+
+        // Generate new date idea
+        function generateNewDate(preference) {
+            const result = dateIdeas[preference][Math.floor(Math.random() * dateIdeas[preference].length)];
+            document.getElementById('date-result').innerHTML = `
+                <h3>Your Perfect Date Idea</h3>
+                <p>${result}</p>
+                <button class="btn" onclick="generateNewDate('${preference}')">Generate Another</button>
+            `;
+        }
+
+        // Generate love letter
+        function generateLetter() {
+            const length = document.getElementById('relationship-length').value;
+            const reason = document.getElementById('love-reason').value;
+            
+            const templates = [
+                `My dearest,\n\nFor ${length}, you've made every day brighter. ${reason} is just one of the countless things that make you special to me. You're my best friend, my confidant, and my true love.\n\nForever yours`,
+                `Beloved,\n\nThese past ${length} have been the most amazing time of my life. When I think about ${reason}, my heart fills with joy. You're everything I've ever dreamed of and more.\n\nAll my love`,
+                `Darling,\n\n${length} of loving you has shown me what true happiness means. Your ${reason} captivates me every single day. You're my perfect Valentine, today and always.\n\nYours truly`
             ];
+            
+            const letter = templates[Math.floor(Math.random() * templates.length)];
+            
+            const resultElement = document.getElementById('letter-result');
+            resultElement.innerHTML = `
+                <h3>Your Love Letter</h3>
+                <p style="white-space: pre-line">${letter}</p>
+                <button class="btn" onclick="generateLetter()">Generate Another</button>
+            `;
+            resultElement.style.display = 'block';
+        }
 
-            let currentQuestion = 0;
-            let answers = [];
+        // Reset quiz
+        function resetQuiz() {
+            state.quizAnswers = {};
+            document.getElementById('quiz-result').style.display = 'none';
+        }
 
-            showQuestion();
-
-            function showQuestion() {
-                const question = questions[currentQuestion];
-                showModal("Gift Finder Quiz", `
-                    <div class="quiz-container">
-                        <div class="question">${question.question}</div>
-                        <div class="options">
-                            ${question.options.map(option => `
-                                <div class="option" onclick="selectOption('${option}')">${option}</div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `);
-            }
-
-            window.selectOption = function(option) {
-                answers.push(option.toLowerCase());
-                currentQuestion++;
-
-                if (currentQuestion < questions.length) {
-                    showQuestion();
-                } else {
-                    // Show results
-                    const budget = answers[0].includes('budget') ? 'budget' : 'luxury';
-                    const category = answers[1].replace(' ', '').toLowerCase();
-                    const suggestions = giftIdeas[budget][category];
-
-                    showModal("Perfect Gift Suggestions", `
-                        <div class="generator-container">
-                            <h3>Based on your answers, here are some perfect gift ideas:</h3>
+        // Initialize stay-at-home date ideas
+        function initializeHomeDates() {
+            const container = document.getElementById('home-dates');
+            stayHomeIdeas.forEach(idea => {
+                const dateCard = document.createElement('div');
+                dateCard.className = 'tutorial';
+                dateCard.innerHTML = `
+                    <div class="tutorial-steps">
+                        <h3>${idea.title}</h3>
+                        <div class="step">${idea.description}</div>
+                        <div class="step">
+                            <strong>What you'll need:</strong>
                             <ul>
-                                ${suggestions.map(gift => `<li>${gift}</li>`).join('')}
+                                ${idea.materials.map(material => `<li>${material}</li>`).join('')}
                             </ul>
                         </div>
-                    `);
-                }
-            };
+                    </div>
+                `;
+                container.appendChild(dateCard);
+            });
         }
 
-        // Date generator functionality
-        function generateDate() {
-            const preferences = {
-                location: Math.random() > 0.5 ? 'indoor' : 'outdoor',
-                budget: Math.random() > 0.5 ? 'budget' : 'luxury'
-            };
-
-            const datePool = dateIdeas[preferences.location][preferences.budget];
-            const randomDate = datePool[Math.floor(Math.random() * datePool.length)];
-
-            showModal("Perfect Date Idea", `
-                <div class="generator-container">
-                    <h3>Here's your perfect date idea:</h3>
-                    <p>${randomDate}</p>
-                    <h4>Location: ${preferences.location}</h4>
-                    <h4>Budget: ${preferences.budget}</h4>
-                </div>
-            `);
-        }
-
-        // Love letter generator
-        function showLoveLetterGenerator() {
-            showModal("Love Letter Generator", `
-                <div class="generator-container">
-                    <input type="text" id="partnerName" placeholder="Partner's name" class="form-input">
-                    <select id="occasion" class="form-input">
-                        <option value="valentine">Valentine's Day</option>
-                        <option value="anniversary">Anniversary</option>
-                        <option value="justBecause">Just Because</option>
-                    </select>
-                    <button class="btn" onclick="
+        // Initialize the page
+        window.onload = function() {
+            initializeHomeDates();
+        };
+    </script>
+</body>
+</html>
